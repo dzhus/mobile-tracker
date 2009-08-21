@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="MobileTracker" default="build" basedir=".">
+  <taskdef resource="antenna.properties"/>
+  <loadproperties srcfile="build.properties" />
+  <loadproperties srcfile="project.properties" />
+  <target name="jad">
+    <delete dir="${dist.dir}" />
+    <mkdir dir="${dist.dir}" />
+    
+    <wtkjad jadfile="${dist.jad}"
+            jarfile="${dist.jar}"
+            name="${app.name}"
+            vendor="${app.vendor}"
+            version="${app.version}">
+      <midlet name="${app.name}" class="${app.name}"/>
+    </wtkjad>
+  </target>
+  
+  <target name="build">
+    <delete dir="${build.dir}" />
+    <mkdir dir="${build.dir}" />
+
+    <wtkbuild srcdir="${src.dir}"
+              destdir="${build.dir}"
+              preverify="false" />
+  </target>
+  
+  <target name="dist" depends="build, jad">
+    <wtkpackage jarfile="${dist.jar}"
+                jadfile="${dist.jad}"
+                obfuscate="false"
+                preverify="true">
+      <fileset dir="${build.dir}"/>
+    </wtkpackage>
+  </target>
+  
+  <target name="run" depends="dist">
+    <wtkrun jadfile="${dist.jad}" />
+  </target>
+</project>
