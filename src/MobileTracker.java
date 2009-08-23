@@ -125,6 +125,10 @@ public class MobileTracker
 
             filestream = new DataOutputStream
                 (fileconn.openOutputStream(fileconn.fileSize()));
+
+            filestream.write
+                (new String("# Logging started " +
+                            timestamp.toString() + "\n").getBytes());
         }
         catch (IOException ioe) {
             handleException(ioe, "I/O error");
