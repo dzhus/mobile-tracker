@@ -15,7 +15,7 @@ public class MobileTracker
      */
     private int updateTimeout = 5000;
 
-    private StringItem timeItem = new StringItem("Last update:", null);
+    private StringItem timeoutItem = new StringItem("Update timeout: ", null);
     private StringItem locationItem = new StringItem("Location: ", null);
 
     /**
@@ -31,12 +31,14 @@ public class MobileTracker
     public MobileTracker() {
         setupTimer();
         form = new Form("Mobile Tracker");
-        form.append(timeItem);
+        form.append(timeoutItem);
         form.append(locationItem);
         
         form.append(historyBox);
 
-        timeItem.setLayout(Item.LAYOUT_NEWLINE_AFTER);
+        timeoutItem.setText(String.valueOf(updateTimeout / 1000) + " seconds");
+
+        timeoutItem.setLayout(Item.LAYOUT_NEWLINE_AFTER);
         locationItem.setLayout(Item.LAYOUT_NEWLINE_AFTER);
 
         form.addCommand(new Command("Exit", Command.EXIT, 0));
@@ -65,7 +67,6 @@ public class MobileTracker
 
     private void updateForm() {
         locationItem.setText(makeLocationMark(cellid, lac));
-        timeItem.setText(new Date().toString());
     }
 
     private void logLocation() {
