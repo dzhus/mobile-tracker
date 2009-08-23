@@ -37,4 +37,9 @@
   <target name="run" depends="dist">
     <wtkrun jadfile="${dist.jad}" />
   </target>
+
+  <target name="clean">
+    <delete failonerror="false" dir="${build.dir}"/>
+    <delete failonerror="false" dir="${dist.dir}"/>
+  </target>
 </project>
