@@ -1,6 +1,9 @@
 package mobiletracker;
 
 import java.util.*;
+import java.io.*;
+import javax.microedition.io.*;
+import javax.microedition.io.file.*;
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
 
@@ -11,6 +14,11 @@ public class MobileTracker
     private Form form;
     private String lac;
     private String cellid;
+
+    /**
+     * Timestamp of last update.
+     */
+    private Date timestamp = new Date();
 
     /**
      * Time interval between location updates, in ms.
@@ -25,16 +33,18 @@ public class MobileTracker
     private Timer updateTimer = new Timer();
     private Timer progressTimer = new Timer();
 
-
     private StringItem timeoutItem = new StringItem("Update timeout: ", null);
     private StringItem locationItem = new StringItem("Location: ", null);
     private WrappingGauge progressGauge = new WrappingGauge("Time until next update:", false, 100, 0);
+
+
+    private FileConnection fileconn;
+    private DataOutputStream filestream;
 
     /**
      * Create a form with elements.
      */
     public MobileTracker() {
-        setupTimers();
         form = new Form("Mobile Tracker");
         form.append(timeoutItem);
         form.append(progressGauge);
@@ -48,16 +58,28 @@ public class MobileTracker
 
         form.addCommand(new Command("Exit", Command.EXIT, 0));
         form.setCommandListener(this);
+        
+        setupLogfile();
+        setupTimers();
     }
 
+    /**
+     * Show exception message in alert box and go back to form.
+     */
+    private void handleException(Exception e, String title) {
+        Alert a = new Alert(title, e.getMessage(), null, AlertType.ERROR);
+        a.setTimeout(Alert.FOREVER);
+        Display.getDisplay(this).setCurrent(a, form);
+    }
+        
     /**
      * Update location, refresh form and log.
      */
     private TimerTask updateTask = new TimerTask() {
             public void run() {
-                logLocation();
                 updateLocation();
                 updateForm();
+                logLocation();
             }
         };
 
@@ -75,17 +97,47 @@ public class MobileTracker
     private void updateLocation() {
         cellid = System.getProperty("com.sonyericsson.net.cellid");
         lac = System.getProperty("com.sonyericsson.net.lac");
-    }
-
-    private String makeLocationMark(String cellid, String lac) {
-        return cellid + "@" + lac;
+        timestamp.setTime(System.currentTimeMillis());
     }
 
     private void updateForm() {
-        locationItem.setText(makeLocationMark(cellid, lac));
+        locationItem.setText(cellid + "@" + lac);
+    }
+
+    /**
+     * Return a String for writing current location to file.
+     */
+    public String currentLocationLine() {
+        return new Long(timestamp.getTime()).toString() + ","
+            + cellid + "," + lac + "\n";
+    }
+
+    /**
+     * Open FileConnection and DataOutputStream for track.txt log file.
+     */
+    private void setupLogfile() {
+        try {
+            fileconn = (FileConnection) Connector.open
+                ("file:///MemoryStick/Other/track.txt");
+
+            if (!fileconn.exists())
+                fileconn.create();
+
+            filestream = new DataOutputStream
+                (fileconn.openOutputStream(fileconn.fileSize()));
+        }
+        catch (IOException ioe) {
+            handleException(ioe, "I/O error");
+        }
     }
 
     private void logLocation() {
+        try {
+            filestream.write(currentLocationLine().getBytes());
+        }
+        catch (IOException ioe) {
+            handleException(ioe, "I/O error");
+        }
     }
 
     /**
@@ -104,6 +156,13 @@ public class MobileTracker
     }
 
     public final void destroyApp(boolean unconditional) {
+        try {
+            filestream.close();
+            fileconn.close();
+        }
+        catch (IOException ioe) {
+            handleException(ioe, "I/O error");
+        }
     }
 
     public final void commandAction(Command c, Displayable s) {
