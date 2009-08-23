@@ -15,23 +15,33 @@ public class MobileTracker
      */
     private int updateTimeout = 5000;
 
+    /**
+     * Time interval between progress bar state updates, in ms.
+     */
+    private int progressTimeout = 1000;
+
+    private Timer updateTimer = new Timer();
+    private Timer progressTimer = new Timer();
+
+
     private StringItem timeoutItem = new StringItem("Update timeout: ", null);
     private StringItem locationItem = new StringItem("Location: ", null);
-
-    private Timer timer = new Timer();
+    private Gauge progressGauge = new Gauge("Time until next update:", false, 100, 0);
 
     /**
      * Create a form with elements.
      */
     public MobileTracker() {
-        setupTimer();
+        setupTimers();
         form = new Form("Mobile Tracker");
         form.append(timeoutItem);
+        form.append(progressGauge);
         form.append(locationItem);
 
         timeoutItem.setText(String.valueOf(updateTimeout / 1000) + " seconds");
 
         timeoutItem.setLayout(Item.LAYOUT_NEWLINE_AFTER);
+        progressGauge.setLayout(Item.LAYOUT_NEWLINE_AFTER);
         locationItem.setLayout(Item.LAYOUT_NEWLINE_AFTER);
 
         form.addCommand(new Command("Exit", Command.EXIT, 0));
@@ -46,6 +56,22 @@ public class MobileTracker
                 logLocation();
                 updateLocation();
                 updateForm();
+            }
+        };
+
+    /**
+     * Increment progressGauge or snap it to zero if maximum reached.
+     */
+    private TimerTask progressTask = new TimerTask() {
+            public void run() {
+                if (progressGauge.getValue() != progressGauge.getMaxValue())
+                    {
+                        float factor = new Integer(progressTimeout).floatValue() / updateTimeout;
+                        progressGauge.setValue(progressGauge.getValue() +
+                                               new Float(factor * progressGauge.getMaxValue()).intValue());
+                    }
+                else
+                    progressGauge.setValue(0);
             }
         };
 
@@ -65,8 +91,12 @@ public class MobileTracker
     private void logLocation() {
     }
 
-    private void setupTimer() {
-        timer.schedule(updateTask, 0, updateTimeout);
+    /**
+     * Schedule location update and progress bar update tasks.
+     */
+    private void setupTimers() {
+        updateTimer.schedule(updateTask, 0, updateTimeout);
+        progressTimer.schedule(progressTask, 0, progressTimeout);
     }
 
     public final void startApp() {
