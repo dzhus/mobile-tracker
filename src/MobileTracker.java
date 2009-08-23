@@ -18,11 +18,6 @@ public class MobileTracker
     private StringItem timeoutItem = new StringItem("Update timeout: ", null);
     private StringItem locationItem = new StringItem("Location: ", null);
 
-    /**
-     * TextBox which contains locations history over the last time.
-     */
-    private TextField historyBox = new TextField("History:", null, 1000, TextField.UNEDITABLE);
-
     private Timer timer = new Timer();
 
     /**
@@ -33,8 +28,6 @@ public class MobileTracker
         form = new Form("Mobile Tracker");
         form.append(timeoutItem);
         form.append(locationItem);
-        
-        form.append(historyBox);
 
         timeoutItem.setText(String.valueOf(updateTimeout / 1000) + " seconds");
 
@@ -70,7 +63,6 @@ public class MobileTracker
     }
 
     private void logLocation() {
-        historyBox.insert(makeLocationMark(cellid, lac) + "\n", historyBox.size());
     }
 
     private void setupTimer() {
