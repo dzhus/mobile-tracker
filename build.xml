@@ -39,7 +39,7 @@
   </target>
 
   <target name="clean">
-    <delete failonerror="false" dir="${build.dir}"/>
-    <delete failonerror="false" dir="${dist.dir}"/>
+    <delete failonerror="false" dir="${build.dir}" />
+    <delete failonerror="false" dir="${dist.dir}" />
   </target>
 </project>
