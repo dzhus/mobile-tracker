@@ -1,3 +1,5 @@
+package mobiletracker;
+
 import java.util.*;
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
@@ -26,7 +28,7 @@ public class MobileTracker
 
     private StringItem timeoutItem = new StringItem("Update timeout: ", null);
     private StringItem locationItem = new StringItem("Location: ", null);
-    private Gauge progressGauge = new Gauge("Time until next update:", false, 100, 0);
+    private WrappingGauge progressGauge = new WrappingGauge("Time until next update:", false, 100, 0);
 
     /**
      * Create a form with elements.
@@ -64,14 +66,9 @@ public class MobileTracker
      */
     private TimerTask progressTask = new TimerTask() {
             public void run() {
-                if (progressGauge.getValue() != progressGauge.getMaxValue())
-                    {
-                        float factor = new Integer(progressTimeout).floatValue() / updateTimeout;
-                        progressGauge.setValue(progressGauge.getValue() +
-                                               new Float(factor * progressGauge.getMaxValue()).intValue());
-                    }
-                else
-                    progressGauge.setValue(0);
+                float factor = new Integer(progressTimeout).floatValue() / updateTimeout;
+                progressGauge.setValue(progressGauge.getValue() +
+                                       new Float(factor * progressGauge.getMaxValue()).intValue());
             }
         };
 

@@ -12,7 +12,7 @@
             name="${app.name}"
             vendor="${app.vendor}"
             version="${app.version}">
-      <midlet name="${app.name}" class="${app.name}"/>
+      <midlet name="${app.name}" class="${app.package}.${app.class}"/>
     </wtkjad>
   </target>
   
