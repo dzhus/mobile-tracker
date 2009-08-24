@@ -130,7 +130,7 @@ public class MobileTracker
     private void setupLogfile() {
         try {
             fileconn = (FileConnection) Connector.open
-                ("file:///MemoryStick/Other/track.txt");
+                ("file:///e:/Other/track.txt");
 
             if (!fileconn.exists())
                 fileconn.create();
