@@ -32,9 +32,9 @@ public class MobileTracker
     private int updateTimeout = 300000;
 
     /**
-     * Time interval between progress bar state updates, in ms.
+     * How many times to increment progress bar within one update cycle.
      */
-    private int progressTimeout = 1000;
+    private int progressUpdateFactor = 10;
 
     private Timer updateTimer = new Timer();
     private Timer progressTimer = new Timer();
@@ -81,9 +81,9 @@ public class MobileTracker
      */
     private TimerTask progressTask = new TimerTask() {
             public void run() {
-                float factor = new Integer(progressTimeout).floatValue() / updateTimeout;
-                progressGauge.setValue(progressGauge.getValue() +
-                                       new Float(factor * progressGauge.getMaxValue()).intValue());
+                int increment =
+                    progressGauge.getMaxValue() / progressUpdateFactor;
+                progressGauge.setValue(progressGauge.getValue() + increment);
             }
         };
 
@@ -161,7 +161,7 @@ public class MobileTracker
      */
     private void setupTimers() {
         updateTimer.schedule(updateTask, 0, updateTimeout);
-        progressTimer.schedule(progressTask, 0, progressTimeout);
+        progressTimer.schedule(progressTask, 0, updateTimeout / progressUpdateFactor);
     }
 
     public final void startApp() {
