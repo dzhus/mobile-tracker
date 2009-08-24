@@ -11,8 +11,14 @@ public class MobileTracker
     extends MIDlet
     implements CommandListener {
 
-    private Form form;
+    /**
+     * Current Location Area Code.
+     */
     private String lac;
+
+    /**
+     * Current CellID.
+     */
     private String cellid;
 
     /**
@@ -33,10 +39,10 @@ public class MobileTracker
     private Timer updateTimer = new Timer();
     private Timer progressTimer = new Timer();
 
+    private Form form;
     private StringItem timeoutItem = new StringItem("Update timeout: ", null);
     private StringItem locationItem = new StringItem("Location: ", null);
     private WrappingGauge progressGauge = new WrappingGauge("Time until next update:", false, 100, 0);
-
 
     private FileConnection fileconn;
     private DataOutputStream filestream;
@@ -45,20 +51,7 @@ public class MobileTracker
      * Create a form with elements.
      */
     public MobileTracker() {
-        form = new Form("Mobile Tracker");
-        form.append(timeoutItem);
-        form.append(progressGauge);
-        form.append(locationItem);
-
-        timeoutItem.setText(String.valueOf(updateTimeout / 1000) + " seconds");
-
-        timeoutItem.setLayout(Item.LAYOUT_NEWLINE_AFTER);
-        progressGauge.setLayout(Item.LAYOUT_NEWLINE_AFTER);
-        locationItem.setLayout(Item.LAYOUT_NEWLINE_AFTER);
-
-        form.addCommand(new Command("Exit", Command.EXIT, 0));
-        form.setCommandListener(this);
-        
+        makeForm();
         setupLogfile();
         setupTimers();
     }
@@ -110,6 +103,25 @@ public class MobileTracker
     public String currentLocationLine() {
         return new Long(timestamp.getTime()).toString() + ","
             + cellid + "," + lac + "\n";
+    }
+
+    /**
+     * Make and display main form.
+     */
+    private void makeForm() {
+        form = new Form("Mobile Tracker");
+        form.append(timeoutItem);
+        form.append(progressGauge);
+        form.append(locationItem);
+        
+        timeoutItem.setText(String.valueOf(updateTimeout / 1000) + " seconds");
+        
+        timeoutItem.setLayout(Item.LAYOUT_NEWLINE_AFTER);
+        progressGauge.setLayout(Item.LAYOUT_NEWLINE_AFTER);
+        locationItem.setLayout(Item.LAYOUT_NEWLINE_AFTER);
+
+        form.addCommand(new Command("Exit", Command.EXIT, 0));
+        form.setCommandListener(this);
     }
 
     /**
