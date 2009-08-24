@@ -29,7 +29,7 @@ public class MobileTracker
     /**
      * Time interval between location updates, in ms.
      */
-    private int updateTimeout = 5000;
+    private int updateTimeout = 300000;
 
     /**
      * Time interval between progress bar state updates, in ms.
